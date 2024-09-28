@@ -1,24 +1,24 @@
 PREDEF:
 # はじめに
-  - 00_introduction.re
+ - 00_introduction.re
 
 CHAPS:
 # 水耕栽培生活の紹介
-  - hydroponic_life.re
+ - hydroponic_life.re
 # 装置について
 # 電気代について
-  - device.re
+ - device.re
 # 種植えから収穫までの流れ
 # 継続的な収穫について
-  - cultivation.re
+ - cultivation.re
 # IoT
-  - iot.re
-# 失敗集
-  - failure.re
-# 参考にしたもの
-  - reference.re
+ - iot.re
+# その他
+## 電気代
+## 失敗集
+ - other.re
 # 今後の展望
-  - future.re
+ - future.re
 
 
 # APPENDIX:
@@ -26,4 +26,4 @@ CHAPS:
 
 POSTDEF:
 # あとがき
-  - 99_postscript.re
+ - 99_postscript.re
