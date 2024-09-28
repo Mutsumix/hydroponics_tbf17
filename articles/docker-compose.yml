@@ -1,0 +1,8 @@
+version: "3"
+services:
+  review:
+    image: vvakame/review:5.8
+    volumes:
+      - .:/hydroponics_tbf17
+    build: .
+    working_dir: /hydroponics_tbf17
