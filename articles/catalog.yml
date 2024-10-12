@@ -27,3 +27,6 @@ CHAPS:
 POSTDEF:
 # あとがき
  - 99_postscript.re
+
+# 気になること
+# 全角半角の数字
