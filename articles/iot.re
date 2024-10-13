@@ -13,40 +13,51 @@
 
 == 用意するもの
 
- * ラズベリーパイ（4B）
- TODO フッター　特に詳しくは触れません。前はもっと安かった気がしますが、今一万円以上するみたいです。
+ * ラズベリーパイ（4B）@<fn>{raspberry_pi}
  * 環境センサ
  ** Omronから発売されている 2JCIE-BU01(F1) という機種です
- ** これをラズパイにUSBに接続します。ちなみに公式アプリをアプリストアからダウンロードすれば、特に何の設定もすることなく、スマホからデータの確認が可能です。
+ ** これをラズパイにUSBに接続します。ちなみに公式アプリをアプリストアからダウンロードすれば、特に何の設定もすることなく、スマホからデータの確認が可能です。@<fn>{end_of_service}
 
- TODO アプリの写真
- TODO フッター　しかし2025年9月でアプリのサポートが終了するようです。機器本体も2025年1月で生産終了予定...
+//image[omron_app1][アプリ画面その１][scale=0.5]
+//image[omron_app2][アプリ画面その２][scale=0.5]
+//footnote[raspberry_pi][特に詳しくは触れません。前はもっと安かった気がしますが、今一万円以上するみたいです。]
+//footnote[end_of_service][しかし2025年9月でアプリのサポートが終了するようです。機器本体も2025年1月で生産終了予定...]
 
 == 環境センサを使用するための準備
- * 環境センサをラズパイにUSBで繋ぐ
- ** bluetoothでの接続はうまくいかなかったのでUSBで接続してデータを取得しています。
- * 環境センサを使用するにあたって、権限付与を行います
+まず、環境センサをラズパイにUSBで繋ぎます。（bluetoothでの接続は筆者の環境ではうまくいかなかったのでUSBで接続してデータを取得する方法を取っています）
 
-TODO コード
+=== 環境センサを使用するにあたっての操作
+
+こちらの記事を参考にしています。
+@<href>{https://armadillo.atmark-techno.com/howto/armadillo_2JCIEBU01_USBcom, 「オムロン 環境センサ(USB)」からUSB通信を用いたデータ収集}
+
+USBのポート番号だけ調べて、特に設定はせずに使えました。
+
+以上で事前準備は完了です。
+
 == サンプルコードの紹介
-筆者が作成して使用している、Googleスプレッドシートへのデータ送信のためのサンプルコードを紹介します。
+筆者が作成して使用している、ThingSpeakへのデータ送信のためのサンプルリポジトリを紹介します。
+
+ThingSpeakというサービスを聞き慣れない方に簡単に説明すると、IoTデータを可視化するためのサービスです。@<fn>{thingspeak}
+
+//footnote[thingspeak][本当はGoogleスプレッドシートへのデータ送信を行なっていたのですが、アカウント作成から手順化するのが面倒だったので、方法を変えました。しかし、この方が安定してGrafanaからのデータ参照ができるし、コードもシンプルになったので結果オーライです]
 
 === 実行前の準備
-TODO コードの記述
 
-
-まず、
-https://github.com/Mutsumix/RasPi-EnvSensor-ThingSpeak
-のリポジトリをクローンします。
+まず、GitHubから@<href>{https://github.com/Mutsumix/RasPi-EnvSensor-ThingSpeak, https://github.com/Mutsumix/RasPi-EnvSensor-ThingSpeak}のリポジトリをクローンします。
 
 続いて、必要なライブラリをインストールします。
 
-pip install -r requirements.txt
+//cmd{
+$ pip install -r requirements.txt
+//}
 
 設定ファイルをコピーして編集します。
 
-cp config.yml.example config.yml
-nano config.yml
+//cmd{
+$ cp config.yml.example config.yml
+$ nano config.yml
+//}
 
  * データの取得頻度（分単位）
  * ThingSpeakのAPIキー
@@ -56,7 +67,9 @@ nano config.yml
 
 プログラムの実行
 
-python main.py
+//cmd{
+$ python main.py
+//}
 
 値がThingSpeakに書き込まれていることを確認します。
 
@@ -67,7 +80,7 @@ python main.py
 
 1. Grafana Cloudアカウントの作成:
 
-Grafana Cloudのウェブサイト（https://grafana.com/products/cloud/）にアクセスします。
+Grafana Cloudのウェブサイト（@<href>{https://grafana.com/products/cloud/, Grafana Cloud}）にアクセスします。
 
 "Create free account"をクリックし、指示に従ってアカウントを作成します。
 
@@ -162,13 +175,9 @@ Query設定で以下を入力します：
 
 
 
-//image[grafana][グラファナで作成したダッシュボード][scale=0.5]{
+//image[grafana][グラファナで作成したダッシュボード][scale=0.75]{
 //}
 
 筆者はネットワークカメラとしてSwitchbot社製のものを使っていますが、ネットワークカメラを使うことで、リアルタイムの生育状況を出先から確認することができます。
 
 ラズベリーパイに安価なWebカメラを接続しGooglePhotoに送信し、タイムラプス動画を作成する方法も行なっていますが、この辺はソースコードが整理できしだい公開したいと思っています。
-
-
-== すいません
-本当はGoogleスプレッドシートへのデータ送信を行なっているのですが、手順を書くのが面倒だったので、方法を変えました。
