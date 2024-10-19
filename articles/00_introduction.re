@@ -2,7 +2,7 @@
 
 //flushright{
 
-2024年11月
+2024年10月
 Mutsumix
 
 //}
