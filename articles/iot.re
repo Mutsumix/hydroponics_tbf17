@@ -16,7 +16,7 @@ ThingSpeakで得たデータをGrafanaで参照し、ダッシュボードを作
 
  * Raspberry Pi@<fn>{raspberry_pi}
  * 環境センサ
- ** Omronから発売されている 2JCIE-BU01(F1) という機種になります。
+ ** Omronから発売されている 2JCIE-BU01(F1) という機種を使用します。
  ** これをラズパイにUSB接続します。ちなみに公式アプリをアプリストアからダウンロードすれば、特に何の設定もすることなく、スマホからデータの確認が可能です。@<fn>{end_of_service}
 
 //image[omron_app1][アプリ画面その１][scale=0.5]
@@ -32,20 +32,23 @@ ThingSpeakで得たデータをGrafanaで参照し、ダッシュボードを作
 === 環境センサを使用するにあたっての操作
 
 こちらの記事を参考にしています。
-@<href>{https://armadillo.atmark-techno.com/howto/armadillo_2JCIEBU01_USBcom, 「オムロン 環境センサ(USB)」からUSB通信を用いたデータ収集}
+@<href>{https://armadillo.atmark-techno.com/howto/armadillo_2JCIEBU01_USBcom, 「オムロン 環境センサ(USB)」からUSB通信を用いたデータ収集」}
+（https://armadillo.atmark-techno.com/howto/armadillo_2JCIEBU01_USBcom）
 
-USBのポート番号だけ調べて、特に設定はせずに使えました。
+筆者の場合、USBのポート番号だけ調べて、特に他の設定はせずに使えました。
 
-以上で事前準備は完了です。
+以上でセンサーの準備は完了です。
 
 == サンプルコードの紹介
 筆者が作成して使用している、ThingSpeakへのデータ送信のためのサンプルリポジトリを紹介します。
 
-ThingSpeakというサービスを聞き慣れない方に簡単に説明すると、IoTデータを可視化するためのサービスです。@<fn>{thingspeak}
+ThingSpeakというサービスを知らない方に簡単に説明すると、IoTデータを可視化するためのサービスです。@<fn>{thingspeak}
 
 //footnote[thingspeak][本当はGoogleスプレッドシートへのデータ送信を行なっていたのですが、アカウント作成から手順化するのが面倒だったので、方法を変えました。しかし、この方が安定してGrafanaからのデータ参照ができるし、コードもシンプルになったので結果オーライです]
 
 === プログラム実行前の準備（ThingSpeak側）
+
+プログラムを実行するには、ThingSpeakのチャンネルIDの設定とAPIキーの取得が必要になるので、ThingSpeakアカウントの作成手順からチャンネルの設定までを説明します。
 
 データの受け手となるThingSpeak(@<href>{https://thingspeak.mathworks.com/})のアカウントを作成します。
 
@@ -59,7 +62,7 @@ ThingSpeakというサービスを聞き慣れない方に簡単に説明する�
 
 //image[thingspeak_new_channel][チャンネル作成ボタン][scale=0.75]
 
-チャンネル名とどういった値を受信するのかを設定する必要があるので、以下のように入力します。
+チャンネル名と、どういった値を受信するのかを設定する必要があるので、以下のように入力します。
 
 //image[thingspeak_channel_settings][チャンネル設定画面][scale=0.75]
 
@@ -76,7 +79,7 @@ ThingSpeakというサービスを聞き慣れない方に簡単に説明する�
 
 === プログラム実行前の準備（ラズパイ側）
 
-まず、GitHubから@<href>{https://github.com/Mutsumix/RasPi-EnvSensor-ThingSpeak, https://github.com/Mutsumix/RasPi-EnvSensor-ThingSpeak}のリポジトリをラズパイ上にクローンします。
+まず、ラズパイ上にGitHubから@<href>{https://github.com/Mutsumix/RasPi-EnvSensor-ThingSpeak, https://github.com/Mutsumix/RasPi-EnvSensor-ThingSpeak}のリポジトリをクローンします。
 
 続いて、必要なライブラリをインストールします。
 
@@ -84,16 +87,33 @@ ThingSpeakというサービスを聞き慣れない方に簡単に説明する�
 $ pip install -r requirements.txt
 //}
 
-設定ファイルをコピーして編集します。
+次に設定ファイルをコピーして編集します。
 
 //cmd{
 $ cp config.yml.example config.yml
 $ nano config.yml
 //}
 
+config.ymlで設定できるのは以下の項目です。
+
  * データの取得頻度（分単位）
- * ThingSpeakのAPIキー
+ * ThingSpeakのWrite API キー
  * 環境センサのポート番号
+
+//list[config.yml][config.yml][scale=0.75]{
+# ThingSpeak設定
+thingspeak:
+  api_key: "YOUR_THINGSPEAK_WRITE_API_KEY"  # ThingSpeakのWrite API Key
+
+# センサー設定
+sensor:
+  scheduler:
+    # データ送信の間隔（分）
+    interval_minutes: 60
+  omron:
+    use: True
+    port: "/dev/ttyUSB0"  # センサーのシリアルポート（環境に合わせて変更してください）
+//}
 
 === プログラムの実行
 
@@ -108,8 +128,8 @@ $ python main.py
 //image[thingspeak_data_view][データの確認][scale=0.75]
 
 === Grafanaでダッシュボードを作成する
-これで終了でも良いのですが、あまり面白くないので、私はGrafabaにダッシュボードを作成しています。
-こうすれば、視覚的に今どうなっているのか把握しやすいですし、外出先でも簡単に生育状況を確認することができます。
+これでセンサーの値をWeb上で確認できるようになりましたが、筆者はGrafanaにダッシュボードを作成しています。
+こうすれば、視覚的に今どうなっているのか把握しやすいですし、外出先でも簡単に生育環境の状況を確認することができます。
 
 1. Grafana Cloudアカウントの作成:
 
@@ -119,7 +139,7 @@ Grafana Cloudのウェブサイト（@<href>{https://grafana.com/products/cloud/
 
 //image[grafana_cloud_signup][Grafana Cloudのアカウント登録画面][scale=0.75]
 
-アカウント作成後、セットアップ画面が表示されます。右上の「I'm already fimiliar with Grafana」をクリックし、この画面はスキップします。
+アカウント作成後、セットアップ画面が表示されます。右上の「I'm already familiar with Grafana〜」をクリックし、この画面はスキップします。
 
 //image[grafana_cloud_setup][セットアップ画面][scale=0.75]
 
@@ -129,7 +149,7 @@ Grafana Cloudのウェブサイト（@<href>{https://grafana.com/products/cloud/
 
 #@# 「Add data source」をクリックします。？
 
-検索バーで "JSON" と検索し、「JSON API」を選択します。
+検索バーで 「JSON」 と検索し、「JSON API」を選択します。
 
 //image[grafana_cloud_add_json_api][JSON APIの選択画面][scale=0.75]
 
@@ -151,7 +171,7 @@ Grafana Cloudのウェブサイト（@<href>{https://grafana.com/products/cloud/
 以下の設定を行います。
 
  * Name: ThingSpeak（任意の名前です）
- * URL: https://api.thingspeak.com/channels/ID/feeds.json?api_key=API @<fn>{thingspeak_api_url}
+ * URL: https://api.thingspeak.com/channels/@<b>{ID}/feeds.json?api_key=@<b>{API} @<fn>{thingspeak_api_url}
 
 //image[grafana_cloud_data_source_settings][Data sourceの設定画面][scale=0.75]
 
@@ -175,7 +195,7 @@ Grafana Cloudのウェブサイト（@<href>{https://grafana.com/products/cloud/
 
 //image[grafana_cloud_add_visualization][Visualizationの追加画面][scale=0.75]
 
-データソースを聞かれるので、先ほど作成したThingSpeakを選択するために検索窓に「Things」と入力し、「ThingSpeak」を選択します。
+データソースを聞かれるので、先ほど作成したThingSpeakを選択するために検索窓に「Thing」と入力し、「ThingSpeak」を選択します。
 
 //image[grafana_cloud_select_data_source][Data Sourceの選択画面][scale=0.75]
 
@@ -183,13 +203,17 @@ Grafana Cloudのウェブサイト（@<href>{https://grafana.com/products/cloud/
 
 以下の２つを設定します。
 
+//list[grafana_cloud_data_source_settings_fields][Data Sourceの設定画面][scale=0.75]{
 $. feeds [*].created_at
 $. feeds [*].field1
+//}
 
 また、型[Type]を正しく設定する必要があるため、以下のように設定します。
 
+//list[grafana_cloud_data_source_settings_fields_type][Data Sourceの設定画面][scale=0.75]{
 $. feeds [*].created_at -> Time
 $. feeds [*].field1 -> Number
+//}
 
 //image[grafana_cloud_data_source_settings2][Data Sourceの設定画面][scale=0.75]
 
