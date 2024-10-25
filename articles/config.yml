@@ -22,7 +22,7 @@ bookname: everyday-lettuce
 language: ja
 
 # 書名
-booktitle: {name: "自宅水耕栽培で毎日レタス生活", file-as: "ジタクスイコウサイバイデマイニチレタス"}
+booktitle: {name: "自宅水耕栽培で毎日サラダ生活 レタス編", file-as: "ジタクスイコウサイバイデマイニチサラダ"}
 subtitle: {name: "狭いスペースでも忙しくっても毎日レタスを収穫する方法", file-as: "セマイスペースデモイソガシクッテモマイニチレタスをシュウカクスルホウホウ"}
 # 著者名。「, 」で区切って複数指定できる
 aut: [{name: "Mutsumix", file-as: "ムツミックス"}]
@@ -135,7 +135,7 @@ toc: true
 titlepage: true
 #
 # 自動生成される大扉ページを上書きするファイル。ファイル名を指定すると大扉として入る (PDFMaker向けにはLaTeXソース断片、EPUBMaker向けにはHTMLファイル)
-# titlefile: null
+titlefile: title.tex
 #
 # 原書大扉ページにするファイル。ファイル名を指定すると原書大扉として入る (PDFMaker向けにはLaTeXソース断片、EPUBMaker向けにはHTMLファイル)
 # originaltitlefile: null
