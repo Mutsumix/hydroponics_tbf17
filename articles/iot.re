@@ -2,28 +2,32 @@
 
 収集して得たさまざまな値は多くの知見を与えてくれます。
 
-この章ではラズベリーパイと環境センサーを用いた値の取得方法について解説します。
+この章ではラズベリーパイと環境センサを用いた値の取得方法について解説します。
 
-ただデータが取れるだけでは面白くないので、それを外部に飛ばして可視化する方法についても触れます。
+ただデータが取れるだけでは面白くないので、それを外部に飛ばして可視化する方法についても紹介します。
 
-比較的簡単な手順でかつ無料に使用できるThingSpeakというサービスを使っています。
+筆者は比較的簡単な手順でかつ無料に使用できるThingSpeakというサービスを使っています。
 
-筆者はThingSpeakで得たデータをGrafanaでデータを参照し、ダッシュボードを作っているので、それについても合わせて触れます。（理想はセンサーの値によって給水をしたり温度を調整するといったフローの自動化ができれば良いのですが、今後の課題です）
+ThingSpeakで得たデータをGrafanaで参照し、ダッシュボードを作っているので、それについても合わせて触れます。@<fn>{automation}
+
+//footnote[automation][理想はセンサーの値によって給水をしたり温度を調整するといったフローの自動化ができれば良いのですが、今後の課題です]
 
 == 用意するもの
 
- * ラズベリーパイ（4B）@<fn>{raspberry_pi}
+ * Raspberry Pi@<fn>{raspberry_pi}
  * 環境センサ
  ** Omronから発売されている 2JCIE-BU01(F1) という機種になります。
- ** これをラズパイにUSBに接続します。ちなみに公式アプリをアプリストアからダウンロードすれば、特に何の設定もすることなく、スマホからデータの確認が可能です。@<fn>{end_of_service}
+ ** これをラズパイにUSB接続します。ちなみに公式アプリをアプリストアからダウンロードすれば、特に何の設定もすることなく、スマホからデータの確認が可能です。@<fn>{end_of_service}
 
 //image[omron_app1][アプリ画面その１][scale=0.5]
 //image[omron_app2][アプリ画面その２][scale=0.5]
-//footnote[raspberry_pi][特に詳しくは触れません。前はもっと安かった気がしますが、今一万円以上するみたいです。]
+//footnote[raspberry_pi][Raspberry Pi 4 Model Bで動作確認しています。前はもっと安かった気がしますが、今一万円以上するみたいです。]
 //footnote[end_of_service][しかし2025年9月でアプリのサポートが終了するようです。機器本体も2025年1月で生産終了予定...]
 
 == 環境センサを使用するための準備
-まず、環境センサをラズパイにUSBで繋ぎます。（bluetoothでの接続は筆者の環境ではうまくいかなかったのでUSBで接続してデータを取得する方法を取っています）
+まず、環境センサをラズパイにUSBで繋ぎます。@<fn>{bluetooth}
+
+//footnote[bluetooth][bluetoothでの接続は筆者の環境ではうまくいかなかったのでUSBで接続してデータを取得する方法を取っています]
 
 === 環境センサを使用するにあたっての操作
 
@@ -45,28 +49,28 @@ ThingSpeakというサービスを聞き慣れない方に簡単に説明する�
 
 データの受け手となるThingSpeak(@<href>{https://thingspeak.mathworks.com/})のアカウントを作成します。
 
-//image[thingspeak][ThingSpeakのトップ画面][scale=0.5]
+//image[thingspeak][ThingSpeakのトップ画面][scale=0.75]
 
 登録にはメールアドレスが必要なので、登録と認証を済ませます。
 
-//image[thingspeak_signup][アカウント登録画面][scale=0.5]
+//image[thingspeak_signup][アカウント登録画面][scale=0.75]
 
 登録が完了すると、マイページが表示されるので「New Channel」をクリックします。
 
-//image[thingspeak_new_channel][チャンネル作成ボタン][scale=0.5]
+//image[thingspeak_new_channel][チャンネル作成ボタン][scale=0.75]
 
 チャンネル名とどういった値を受信するのかを設定する必要があるので、以下のように入力します。
 
-//image[thingspeak_channel_settings][チャンネル設定画面][scale=0.5]
+//image[thingspeak_channel_settings][チャンネル設定画面][scale=0.75]
 
 最後に、「Save Channel」をクリックします。
 
-//image[thingspeak_channel_save][チャンネル保存ボタン][scale=0.5]
+//image[thingspeak_channel_save][チャンネル保存ボタン][scale=0.75]
 
 チャンネルが作成されると、各種タブが表示されるので、「API Keys」タブをクリックし、Read API KeysとWrite API Keyが存在するのを確認します。
 
-//image[thingspeak_api_keys][API Keysタブ][scale=0.5]
-//image[thingspeak_api_keys_values][Read API KeysとWrite API Keyの値][scale=0.5]
+//image[thingspeak_api_keys][API Keysタブ][scale=0.75]
+//image[thingspeak_api_keys_values][Read API KeysとWrite API Keyの値][scale=0.75]
 
 これで、ラズパイ側でプログラムを実行し、ThingSpeakにデータを送信する準備が整いました。
 
@@ -101,7 +105,7 @@ $ python main.py
 
 設定した頻度でデータが取得され、値がThingSpeakに書き込まれていることを確認します。
 
-//image[thingspeak_data_view][データの確認][scale=0.5]
+//image[thingspeak_data_view][データの確認][scale=0.75]
 
 === Grafanaでダッシュボードを作成する
 これで終了でも良いのですが、あまり面白くないので、私はGrafabaにダッシュボードを作成しています。
@@ -111,13 +115,13 @@ $ python main.py
 
 Grafana Cloudのウェブサイト（@<href>{https://grafana.com/products/cloud/}）にアクセスします。
 
-"Create free account"をクリックし、指示に従ってアカウントを作成します。ソーシャルログインに対応しているので簡単にログインが可能です。
+「Create free account」をクリックし、指示に従ってアカウントを作成します。ソーシャルログインに対応しているので簡単にログインが可能です。
 
-//image[grafana_cloud_signup][Grafana Cloudのアカウント登録画面][scale=0.5]
+//image[grafana_cloud_signup][Grafana Cloudのアカウント登録画面][scale=0.75]
 
 アカウント作成後、セットアップ画面が表示されます。右上の「I'm already fimiliar with Grafana」をクリックし、この画面はスキップします。
 
-//image[grafana_cloud_setup][セットアップ画面][scale=0.5]
+//image[grafana_cloud_setup][セットアップ画面][scale=0.75]
 
 2. Connectionの追加
 
@@ -127,52 +131,53 @@ Grafana Cloudのウェブサイト（@<href>{https://grafana.com/products/cloud/
 
 検索バーで "JSON" と検索し、「JSON API」を選択します。
 
-//image[grafana_cloud_add_json_api][JSON APIの選択画面][scale=0.5]
+//image[grafana_cloud_add_json_api][JSON APIの選択画面][scale=0.75]
 
-installします
+「install」を選択します。
 
-//image[grafana_cloud_install_json_api][JSON APIのインストール画面][scale=0.5]
+//image[grafana_cloud_install_json_api][JSON APIのインストール画面][scale=0.75]
 
 3. Data Sourceの追加
 
 左側のメニューから「Connections」> 「Data sources」を選択します。
 
-//image[grafana_cloud_data_sources][Data sources画面][scale=0.5]
+//image[grafana_cloud_data_sources][Data sources画面][scale=0.75]
 
-Add new data sourceをクリックし、先ほどインストールしたJSON APIを選択します。
+「Add new data source」をクリックし、先ほどインストールしたJSON APIを選択します。
 
-//image[grafana_cloud_add_data_source][Data sourceの追加画面][scale=0.5]
-//image[grafana_cloud_data_source_select][JSON APIの選択][scale=0.5]
+//image[grafana_cloud_add_data_source][Data sourceの追加画面][scale=0.75]
+//image[grafana_cloud_data_source_select][JSON APIの選択][scale=0.75]
 
-以下の設定を行います：
+以下の設定を行います。
+
  * Name: ThingSpeak（任意の名前です）
- * URL: https://api.thingspeak.com/channels/CHANNEL_ID/feeds.json?api_key=YOUR_API_KEY @<fn>{thingspeak_api_url}
+ * URL: https://api.thingspeak.com/channels/ID/feeds.json?api_key=API @<fn>{thingspeak_api_url}
 
-//image[grafana_cloud_data_source_settings][Data sourceの設定画面][scale=0.5]
+//image[grafana_cloud_data_source_settings][Data sourceの設定画面][scale=0.75]
 
  * ここまでの設定に問題がなければ「Save & Test」をクリックすると、画面上にSuccessと表示され、設定が保存されます。
 
-//image[grafana_cloud_data_source_success][Data sourceの設定成功画面][scale=0.5]
+//image[grafana_cloud_data_source_success][Data sourceの設定成功画面][scale=0.75]
 
-//footnote[thingspeak_api_url][CHANNEL_ID と YOUR_API_KEY はThingSpeakのチャンネルIDとRead API Keyに置き換えてください]
+//footnote[thingspeak_api_url][ID と API はThingSpeakのチャンネルIDとRead API Keyにそれぞれ置き換えてください]
 
 4. ダッシュボードの作成:
 
-左側のメニューから「Create」（+アイコン）> 「Dashboard」を選択します。
+左側のメニューから「Dashboard」を選択します。
 
-//image[grafana_cloud_create_dashboard][Dashboardの作成画面][scale=0.5]
+//image[grafana_cloud_create_dashboard][Dashboardの作成画面][scale=0.75]
 
 「New dashboard」をクリックします。
 
-//image[grafana_cloud_add_dashboard][Panelの追加画面][scale=0.5]
+//image[grafana_cloud_add_dashboard][Panelの追加画面][scale=0.75]
 
 「Add visualization」をクリックします。
 
-//image[grafana_cloud_add_visualization][Visualizationの追加画面][scale=0.5]
+//image[grafana_cloud_add_visualization][Visualizationの追加画面][scale=0.75]
 
 データソースを聞かれるので、先ほど作成したThingSpeakを選択するために検索窓に「Things」と入力し、「ThingSpeak」を選択します。
 
-//image[grafana_cloud_select_data_source][Data Sourceの選択画面][scale=0.5]
+//image[grafana_cloud_select_data_source][Data Sourceの選択画面][scale=0.75]
 
 データソースの詳細設定を行う画面が表示されるので、以下のように設定します。
 
@@ -186,7 +191,7 @@ $. feeds [*].field1
 $. feeds [*].created_at -> Time
 $. feeds [*].field1 -> Number
 
-//image[grafana_cloud_data_source_settings2][Data Sourceの設定画面][scale=0.5]
+//image[grafana_cloud_data_source_settings2][Data Sourceの設定画面][scale=0.75]
 
 すると画面上に取得した数値が折れ線グラフで表示されます。
 
@@ -200,19 +205,19 @@ Grafanaでは表示形式について色々と設定できますが、それに�
 
 参考までに筆者は以下のようなダッシュボードを作成しています。
 
-//image[grafana_cloud_dashboard][筆者のダッシュボード][scale=0.5]
+//image[grafana_cloud_dashboard][筆者のダッシュボード][scale=0.75]
 
 
 == カメラによる監視
 
 また、筆者はネットワークカメラとしてSwitchbot社製のものを使っていますが、ネットワークカメラを使うことで、リアルタイムの生育状況を出先から確認することができます。
 
-//image[switchbot_camera][Switchbotのネットワークカメラで撮影した画像][scale=0.5]
+//image[switchbot_camera][Switchbotのネットワークカメラで撮影した画像][scale=0.75]
 
 ラズベリーパイに安価なWebカメラを接続しGooglePhotoに送信し、タイムラプス動画を作成する方法も行なっていますが、この辺はソースコードが整理できしだい公開したいと思っています。
 
-//image[raspberry_pi_camera][ラズベリーパイに接続したWebカメラで撮影した画像][scale=0.5]
+//image[raspberry_pi_camera][ラズベリーパイに接続したWebカメラで撮影した画像][scale=0.75]
 
 カメラについては試行錯誤中です。
 
-//image[switchbot_and_raspberry_pi_camera][カメラについてはまだ検証中です][scale=0.5]
+//image[switchbot_and_raspberry_pi_camera][カメラについてはまだ検証中です][scale=0.75]
