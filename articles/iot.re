@@ -10,13 +10,13 @@
 
 ThingSpeakで得たデータをGrafanaで参照し、ダッシュボードを作っているので、それについても合わせて触れます。@<fn>{automation}
 
-//footnote[automation][理想はセンサーの値によって給水をしたり温度を調整するといったフローの自動化ができれば良いのですが、今後の課題です]
+//footnote[automation][理想はセンサーの値によって給水をしたり温度を調整するといったフローの自動化ができればよいのですが、今後の課題です]
 
 == 用意するもの
 
  * Raspberry Pi@<fn>{raspberry_pi}
  * 環境センサ
- ** Omronから発売されている 2JCIE-BU01(F1) という機種を使用します。
+ ** Omronから発売されている 2JCIE-BU01（F1） という機種を使用します。
  ** これをラズパイにUSB接続します。ちなみに公式アプリをアプリストアからダウンロードすれば、特に何の設定もすることなく、スマホからデータの確認が可能です。@<fn>{end_of_service}
 
 //image[omron_app1][アプリ画面その１][scale=0.5]
@@ -32,7 +32,7 @@ ThingSpeakで得たデータをGrafanaで参照し、ダッシュボードを作
 === 環境センサを使用するにあたっての操作
 
 こちらの記事を参考にしています。
-@<href>{https://armadillo.atmark-techno.com/howto/armadillo_2JCIEBU01_USBcom, 「オムロン 環境センサ(USB)」からUSB通信を用いたデータ収集」}
+@<href>{https://armadillo.atmark-techno.com/howto/armadillo_2JCIEBU01_USBcom, 「オムロン 環境センサ（USB）」からUSB通信を用いたデータ収集」}
 （https://armadillo.atmark-techno.com/howto/armadillo_2JCIEBU01_USBcom）
 
 筆者の場合、USBのポート番号だけ調べて、特に他の設定はせずに使えました。
@@ -50,7 +50,7 @@ ThingSpeakというサービスを知らない方に簡単に説明すると、I
 
 プログラムを実行するには、ThingSpeakのチャンネルIDの設定とAPIキーの取得が必要になるので、ThingSpeakアカウントの作成手順からチャンネルの設定までを説明します。
 
-データの受け手となるThingSpeak(@<href>{https://thingspeak.mathworks.com/})のアカウントを作成します。
+データの受け手となるThingSpeak（@<href>{https://thingspeak.mathworks.com/}）のアカウントを作成します。
 
 //image[thingspeak][ThingSpeakのトップ画面][scale=0.75]
 
@@ -62,7 +62,7 @@ ThingSpeakというサービスを知らない方に簡単に説明すると、I
 
 //image[thingspeak_new_channel][チャンネル作成ボタン][scale=0.75]
 
-チャンネル名と、どういった値を受信するのかを設定する必要があるので、以下のように入力します。
+チャンネル名と、どういった値を受信するのかを設定する必要があるので、次のように入力します。
 
 //image[thingspeak_channel_settings][チャンネル設定画面][scale=0.75]
 
@@ -94,11 +94,11 @@ $ cp config.yml.example config.yml
 $ nano config.yml
 //}
 
-config.ymlで設定できるのは以下の項目です。
+config.ymlで設定できるのは次の項目です。
 
- * データの取得頻度（分単位）
- * ThingSpeakのWrite API キー
- * 環境センサのポート番号
+ * api_key: ThingSpeakのWrite API キー
+ * interval_minutes: データの取得頻度（分単位）
+ * port: 環境センサのポート番号
 
 //list[config.yml][config.yml][scale=0.75]{
 # ThingSpeak設定
@@ -117,7 +117,7 @@ sensor:
 
 === プログラムの実行
 
-プログラムの実行は以下のコマンドで行えます。
+プログラムの実行は次のコマンドで行えます。
 
 //cmd{
 $ python main.py
@@ -135,7 +135,7 @@ $ python main.py
 
 Grafana Cloudのウェブサイト（@<href>{https://grafana.com/products/cloud/}）にアクセスします。
 
-「Create free account」をクリックし、指示に従ってアカウントを作成します。ソーシャルログインに対応しているので簡単にログインが可能です。
+「Create free account」をクリックし、指示にしたがってアカウントを作成します。ソーシャルログインに対応しているので簡単にログインが可能です。
 
 //image[grafana_cloud_signup][Grafana Cloudのアカウント登録画面][scale=0.75]
 
@@ -168,7 +168,7 @@ Grafana Cloudのウェブサイト（@<href>{https://grafana.com/products/cloud/
 //image[grafana_cloud_add_data_source][Data sourceの追加画面][scale=0.75]
 //image[grafana_cloud_data_source_select][JSON APIの選択][scale=0.75]
 
-以下の設定を行います。
+次の設定を行います。
 
  * Name: ThingSpeak（任意の名前です）
  * URL: https://api.thingspeak.com/channels/@<b>{ID}/feeds.json?api_key=@<b>{API} @<fn>{thingspeak_api_url}
@@ -199,16 +199,16 @@ Grafana Cloudのウェブサイト（@<href>{https://grafana.com/products/cloud/
 
 //image[grafana_cloud_select_data_source][Data Sourceの選択画面][scale=0.75]
 
-データソースの詳細設定を行う画面が表示されるので、以下のように設定します。
+データソースの詳細設定を行う画面が表示されるので、設定を行います。
 
-以下の２つを設定します。
+次の２つを設定します（@<list>{grafana_cloud_data_source_settings_fields}）。
 
 //list[grafana_cloud_data_source_settings_fields][Data Sourceの設定画面][scale=0.75]{
 $. feeds [*].created_at
 $. feeds [*].field1
 //}
 
-また、型[Type]を正しく設定する必要があるため、以下のように設定します。
+また、型[Type]を正しく設定する必要があるため、次のように設定します（@<list>{grafana_cloud_data_source_settings_fields_type}）。
 
 //list[grafana_cloud_data_source_settings_fields_type][Data Sourceの設定画面][scale=0.75]{
 $. feeds [*].created_at -> Time
@@ -227,10 +227,9 @@ Save Dashboardをクリックしてダッシュボードを保存します。
 
 Grafanaでは表示形式について色々と設定できますが、それについて説明すると長くなってしまうのと、筆者自身が詳しくないため、割愛します。
 
-参考までに筆者は以下のようなダッシュボードを作成しています。
+参考までに筆者はこちらの図のようなダッシュボードを作成しています。
 
 //image[grafana_cloud_dashboard][筆者のダッシュボード][scale=0.75]
-
 
 == カメラによる監視
 
