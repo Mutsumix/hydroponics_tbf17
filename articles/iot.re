@@ -31,11 +31,66 @@ ThingSpeakで得たデータをGrafanaで参照し、ダッシュボードを作
 
 === 環境センサを使用するにあたっての操作
 
-こちらの記事を参考にしています。
-@<href>{https://armadillo.atmark-techno.com/howto/armadillo_2JCIEBU01_USBcom, 「オムロン 環境センサ（USB）」からUSB通信を用いたデータ収集」}
-（https://armadillo.atmark-techno.com/howto/armadillo_2JCIEBU01_USBcom）
+プログラムから環境センサを使用するためには、センサとドライバーを関連付ける必要があります。@<fn>{usb_driver}
 
-筆者の場合、USBのポート番号だけ調べて、特に他の設定はせずに使えました。
+//footnote[usb_driver][こちらの記事を全面的に参考にしています。@<href>{https://qiita.com/Toshiaki0315/items/aa43e78c024bb900ef53, オムロン環境センサ（2JCIE-BU）をラズパイで使ってみた。（１）}（https://qiita.com/Toshiaki0315/items/aa43e78c024bb900ef53）]
+
+こちらの記事を全面的に参考にしています。
+
+環境センサをUSB接続した状態で、FTDIのドライバと2JCIE-BUを関連付けます。
+
+//cmd{
+$ lsusb
+//}
+
+まず、lsusbコマンドでデバイス情報を確認し、次のようにOmronのデバイスが表示されればOKです。
+
+//list[lsusb_output][lsusbコマンドの出力][scale=0.75]{
+Bus 001 Device 002: ID 0590:00d4 Omron Corp.
+//}
+
+
+続いて、こちらのコマンドでFTDIのドライバと2JCIE-BUを関連付けます。
+
+//cmd{
+$ sudo modprobe ftdi_sio
+$ sudo sh -c "echo 0590 00d4 > /sys/bus/usb-serial/drivers/ftdi_sio/new_id"
+//}
+
+確認はこちらのコマンドで行います。
+
+//cmd{
+$ dmesg | grep USB
+//}
+
+一番最後の行でFTDI USB Serial Device converterがttyUSB0として認識されていればOKです。
+
+//list[dmesg_output][dmesgコマンドの出力（最終行）][scale=0.75]{
+usb 1-1.4: FTDI USB Serial Device converter now attached to ttyUSB0
+//}
+
+仕上げとして、再起動のたびに毎回前述のコマンドを打たなくても済むように、2JCIE-BUを自動認識するように設定します。@<fn>{vi}
+
+//footnote[vi][viに慣れていない方はnanoを使ってね。sudo nano /etc/udev/rules.d/80-2jcie-bu01-usb.rules]
+
+//cmd{
+$ sudo vi /etc/udev/rules.d/80-2jcie-bu01-usb.rules
+//}
+
+このファイルに次の3行を記述します。
+
+//list[udev_rules][udevのルール][scale=0.75]{
+ACTION=="add", \
+SUBSYSTEMS=="usb", \
+ATTRS{idVendor}=="0590", ATTRS{idProduct}=="00d4", \
+RUN+="/bin/sh -c '/sbin/modprobe ftdi_sio && echo 0590 00d4 > @<embed>$|latex|\linebreak\hspace*{5ex}$/sys/bus/usb-serial/drivers/ftdi_sio/new_id'"
+//}
+
+保存をしたら、udevに新しいルールを適用します。
+
+//cmd{
+$ sudo udevadm control --reload
+//}
 
 以上でセンサーの準備は完了です。
 
@@ -79,11 +134,10 @@ ThingSpeakというサービスを知らない方に簡単に説明すると、I
 
 === プログラム実行前の準備（ラズパイ側）
 
-まず、ラズパイ上にGitHubから@<href>{https://github.com/Mutsumix/RasPi-EnvSensor-ThingSpeak, https://github.com/Mutsumix/RasPi-EnvSensor-ThingSpeak}のリポジトリをクローンします。
-
-続いて、必要なライブラリをインストールします。
+まず、ラズパイ上にGitHubから@<href>{https://github.com/Mutsumix/RasPi-EnvSensor-ThingSpeak, https://github.com/Mutsumix/RasPi-EnvSensor-ThingSpeak}のリポジトリをクローンし、続いて、必要なライブラリをインストールします。
 
 //cmd{
+$ cd RasPi-EnvSensor-ThingSpeak
 $ pip install -r requirements.txt
 //}
 
