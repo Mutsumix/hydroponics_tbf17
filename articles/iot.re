@@ -237,7 +237,7 @@ Grafana Cloudのウェブサイト（@<href>{https://grafana.com/products/cloud/
 
 4. ダッシュボードの作成:
 
-左側のメニューから「Dashboard」を選択します。
+左側のメニューから「Dashboards」を選択します。
 
 //image[grafana_cloud_create_dashboard][Dashboardの作成画面][scale=0.75]
 
@@ -249,7 +249,7 @@ Grafana Cloudのウェブサイト（@<href>{https://grafana.com/products/cloud/
 
 //image[grafana_cloud_add_visualization][Visualizationの追加画面][scale=0.75]
 
-データソースを聞かれるので、先ほど作成したThingSpeakを選択するために検索窓に「Thing」と入力し、「ThingSpeak」を選択します。
+データソースを聞かれるので、先ほど作成したThingSpeakを選択するために検索窓に「thing」と入力し、「ThingSpeak」を選択します。
 
 //image[grafana_cloud_select_data_source][Data Sourceの選択画面][scale=0.75]
 
@@ -287,9 +287,9 @@ Grafanaでは表示形式について色々と設定できますが、それに�
 
 == カメラによる監視
 
-また、筆者はネットワークカメラとしてSwitchbot社製のものを使っていますが、ネットワークカメラを使うことで、リアルタイムの生育状況を出先から確認することができます。
+また、筆者はネットワークカメラとしてSwitchBotの製品を使っていますが、ネットワークカメラを使うことで、リアルタイムの生育状況を出先から確認することができます。
 
-//image[switchbot_camera][Switchbotのネットワークカメラで撮影した画像][scale=0.75]
+//image[switchbot_camera][SwitchBotのネットワークカメラで撮影した画像][scale=0.75]
 
 ラズベリーパイに安価なWebカメラを接続しGooglePhotoに送信し、タイムラプス動画を作成する方法も行なっていますが、この辺はソースコードが整理できしだい公開したいと思っています。
 
@@ -297,4 +297,4 @@ Grafanaでは表示形式について色々と設定できますが、それに�
 
 カメラについては試行錯誤中です。
 
-//image[switchbot_and_raspberry_pi_camera][カメラについてはまだ検証中です][scale=0.75]
+//image[switchbot_and_raspberry_pi_camera][検証中][scale=0.75]
